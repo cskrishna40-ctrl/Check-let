@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Security Learning Lab</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        nav {
+            margin-bottom: 30px;
+        }
+
+        nav a {
+            margin-right: 15px;
+        }
+
+        section {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        input, button {
+            padding: 8px;
+            margin: 5px 0;
+        }
+
+        .result {
+            padding: 10px;
+            background: #f3f3f3;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Security Learning Lab</h1>
+        <p>A website for practicing web security.</p>
+    </header>
+
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#login">Login</a>
+        <a href="#search">Search</a>
+        <a href="#profile">Profile</a>
+        <a href="#admin">Admin</a>
+    </nav>
+
+
+    <section id="home">
+        <h2>Home</h2>
+
+        <p>
+            This is a deliberately simple website used for security learning.
+        </p>
+
+        <p>
+            Everything here is running as client-side HTML and JavaScript.
+        </p>
+    </section>
+
+
+    <section id="login">
+        <h2>Login</h2>
+
+        <form id="loginForm">
+
+            <label>
+                Username:
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                >
+            </label>
+
+            <br>
+
+            <label>
+                Password:
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                >
+            </label>
+
+            <br>
+
+            <button type="submit">
+                Login
+            </button>
+
+        </form>
+
+        <div id="loginResult" class="result"></div>
+    </section>
+
+
+    <section id="search">
+        <h2>Search</h2>
+
+        <form id="searchForm">
+
+            <input
+                type="text"
+                id="searchInput"
+                name="q"
+                placeholder="Search something"
+            >
+
+            <button type="submit">
+                Search
+            </button>
+
+        </form>
+
+        <div id="searchResult" class="result"></div>
+    </section>
+
+
+    <section id="profile">
+        <h2>Profile</h2>
+
+        <p id="profileStatus">
+            You are currently browsing as a guest.
+        </p>
+
+        <button onclick="showProfile()">
+            View Profile
+        </button>
+
+        <div id="profileResult" class="result"></div>
+    </section>
+
+
+    <section id="admin">
+        <h2>Admin Panel</h2>
+
+        <p>
+            This area represents a protected resource.
+        </p>
+
+        <button onclick="checkAdmin()">
+            Check Access
+        </button>
+
+        <div id="adminResult" class="result"></div>
+    </section>
+
+
+    <section>
+        <h2>Debug Information</h2>
+
+        <button onclick="showDebug()">
+            Show Debug Information
+        </button>
+
+        <pre id="debugResult"></pre>
+    </section>
+
+
+    <script>
+
+        let currentUser = null;
+
+
+        /*
+         * LOGIN
+         */
+
+        document
+            .getElementById("loginForm")
+            .addEventListener("submit", function(event) {
+
+                event.preventDefault();
+
+                const username =
+                    document.getElementById("username").value;
+
+                const password =
+                    document.getElementById("password").value;
+
+                if (
+                    username === "admin" &&
+                    password === "password123"
+                ) {
+
+                    currentUser = {
+                        username: "admin",
+                        role: "admin"
+                    };
+
+                    document.getElementById("loginResult")
+                        .textContent =
+                        "Logged in as administrator.";
+
+                }
+
+                else if (
+                    username === "guest" &&
+                    password === "guest123"
+                ) {
+
+                    currentUser = {
+                        username: "guest",
+                        role: "guest"
+                    };
+
+                    document.getElementById("loginResult")
+                        .textContent =
+                        "Logged in as guest.";
+
+                }
+
+                else {
+
+                    document.getElementById("loginResult")
+                        .textContent =
+                        "Invalid credentials.";
+
+                }
+
+            });
+
+
+        /*
+         * SEARCH
+         */
+
+        document
+            .getElementById("searchForm")
+            .addEventListener("submit", function(event) {
+
+                event.preventDefault();
+
+                const query =
+                    document.getElementById("searchInput").value;
+
+                document.getElementById("searchResult")
+                    .textContent =
+                    "You searched for: " + query;
+
+            });
+
+
+        /*
+         * PROFILE
+         */
+
+        function showProfile() {
+
+            const result =
+                document.getElementById("profileResult");
+
+            if (currentUser === null) {
+
+                result.textContent =
+                    "You are not logged in.";
+
+                return;
+            }
+
+            result.textContent =
+                "Username: " +
+                currentUser.username +
+                " | Role: " +
+                currentUser.role;
+        }
+
+
+        /*
+         * ADMIN ACCESS
+         */
+
+        function checkAdmin() {
+
+            const result =
+                document.getElementById("adminResult");
+
+            if (
+                currentUser &&
+                currentUser.role === "admin"
+            ) {
+
+                result.textContent =
+                    "Access granted. Welcome, administrator.";
+
+            }
+
+            else {
+
+                result.textContent =
+                    "403 Forbidden. Administrator access required.";
+
+            }
+
+        }
+
+
+        /*
+         * DEBUG INFORMATION
+         */
+
+        function showDebug() {
+
+            const result =
+                document.getElementById("debugResult");
+
+            result.textContent =
+                JSON.stringify(
+                    {
+                        currentUser: currentUser,
+                        page: window.location.href,
+                        browser: navigator.userAgent
+                    },
+                    null,
+                    2
+                );
+        }
+
+    </script>
+
+</body>
+</html>
